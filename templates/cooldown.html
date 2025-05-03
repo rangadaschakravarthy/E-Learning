@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooldown Timer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script>
+        function redirectToCourses() {
+            const url = "{{ url_for('courses') }}";  // Dynamically render the courses route
+            window.location.href = url;  // Redirect to the courses page
+        }        
+    </script>
+</head>
+<body>
+    <div class="modal" tabindex="-1" role="dialog" style="display: block; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cooldown Active</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Cooldown time remaining: <strong>{{ remaining_time }}</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="redirectToCourses()">Close and Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

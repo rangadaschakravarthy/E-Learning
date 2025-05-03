@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course_name }} - Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --bg-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background-image: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .quiz-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--bg-gradient);
+            border-radius: 1rem;
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-label:hover {
+            border-color: var(--primary-color);
+            background: #f8fafc;
+        }
+
+        .option-input {
+            display: none;
+        }
+
+        .option-input:checked + .option-label {
+            border-color: var(--primary-color);
+            background: #ede9fe;
+        }
+
+        .option-text {
+            margin-left: 1rem;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--bg-gradient);
+            color: white;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .score-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .score-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-details {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 2rem;
+        }
+
+        .score-feedback {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .feedback-excellent { color: var(--success-color); }
+        .feedback-good { color: var(--primary-color); }
+        .feedback-average { color: var(--warning-color); }
+        .feedback-poor { color: var(--danger-color); }
+
+        @media (max-width: 640px) {
+            .quiz-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .quiz-title {
+                font-size: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .option-label {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+    <script src="{{ url_for('static', filename='js/' + quiz_script) }}" defer></script>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">{{ course_name }} Quiz</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="quiz-content">
+            <div id="question-container" class="question-container"></div>
+            <button id="next-btn" class="btn btn-primary" onclick="submitAnswer()">
+                Next Question
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <div id="score-container" class="score-container" style="display: none;"></div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        function loadQuestion() {
+            const questionContainer = document.getElementById('question-container');
+            const questionData = quizData[currentQuestionIndex];
+            updateProgress();
+
+            let questionHTML = `
+                <h2 class="question-text">Question ${currentQuestionIndex + 1}: ${questionData.question}</h2>
+                <div class="options-container">
+            `;
+
+            questionData.options.forEach((option, index) => {
+                questionHTML += `
+                    <div class="option-wrapper">
+                        <input type="radio" name="option" value="${index}" 
+                               id="option${index}" class="option-input">
+                        <label for="option${index}" class="option-label">
+                            <span class="option-text">${option}</span>
+                        </label>
+                    </div>
+                `;
+            });
+
+            questionHTML += '</div>';
+            questionContainer.innerHTML = questionHTML;
+        }
+
+        function submitAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+
+            if (!selectedOption) {
+                alert('Please select an answer before proceeding.');
+                return;
+            }
+
+            const answerIndex = parseInt(selectedOption.value);
+            if (answerIndex === quizData[currentQuestionIndex].answer) {
+                score++;
+            }
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                displayScore();
+            }
+        }
+
+        function displayScore() {
+            const quizContent = document.getElementById('quiz-content');
+            const scoreContainer = document.getElementById('score-container');
+            const totalQuestions = quizData.length;
+            let percentage = (score / totalQuestions) * 100;
+
+            let feedbackClass = '';
+            let feedback = '';
+
+            if (percentage >= 80) {
+                feedback = 'Excellent! You\'ve mastered this topic!';
+                feedbackClass = 'feedback-excellent';
+            } else if (percentage >= 60) {
+                feedback = 'Good job! Keep learning!';
+                feedbackClass = 'feedback-good';
+            } else if (percentage >= 40) {
+                feedback = 'Not bad, but there\'s room for improvement.';
+                feedbackClass = 'feedback-average';
+            } else {
+                feedback = 'Keep practicing! You\'ll get better!';
+                feedbackClass = 'feedback-poor';
+            }
+            fetch('/submit_quiz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    score: score,
+                    percentage: percentage, 
+                    course_name: "{{ course_name }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Score submitted successfully');
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting score:', error);
+            });
+            quizContent.style.display = 'none';
+            scoreContainer.style.display = 'block';
+            scoreContainer.innerHTML = `
+                <h2 class="score-title">Quiz Complete!</h2>
+                <div class="score-details">
+                    <p>Score: ${score} out of ${totalQuestions}</p>
+                    <p>Percentage: ${percentage.toFixed(1)}%</p>
+                </div>
+                <p class="score-feedback ${feedbackClass}">${feedback}</p>
+                <a href="{{ url_for('course_det', course_name=course_name) }}" class="btn btn-primary">
+                    Return to Courses
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+            `;
+        }
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>

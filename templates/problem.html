@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ problem.title }}</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #6366f1;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .problem-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .problem-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                        linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%),
+                        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            animation: headerPattern 20s linear infinite;
+        }
+
+        @keyframes headerPattern {
+            from { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+            to { background-position: 20px 0, 20px 10px, 30px -10px, 10px 0px; }
+        }
+
+        .problem-header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .problem-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .problem-content {
+            padding: 2.5rem;
+        }
+
+        .problem-description {
+            margin-bottom: 2.5rem;
+            color: #475569;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .example-section {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .example-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .example-section h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .example-section h3::before {
+            content: '▶';
+            font-size: 0.8em;
+            color: var(--secondary-color);
+        }
+
+        .example-box {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-editor {
+            margin-bottom: 2.5rem;
+        }
+
+        .code-editor label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .code-editor textarea {
+            width: 100%;
+            height: 400px;
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            background: var(--code-bg);
+            color: var(--code-text);
+            transition: all 0.3s ease;
+        }
+
+        .code-editor textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .language-select {
+            margin-bottom: 2.5rem;
+        }
+
+        .language-select select {
+            width: 100%;
+            max-width: 250px;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234f46e5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .language-select select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            color: #6b7280;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .back-btn::before {
+            content: '←';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover::before {
+            transform: translateX(-4px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .problem-header {
+                padding: 2rem;
+            }
+
+            .problem-content {
+                padding: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .back-btn {
+                justify-content: center;
+            }
+
+            .example-section {
+                padding: 1.5rem;
+            }
+
+            .code-editor textarea {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="problem-card">
+            <div class="problem-header">
+                <h1>{{ problem.title }}</h1>
+                <p>Problem #{{ problem.id }}</p>
+            </div>
+
+            <div class="problem-content">
+                <div class="problem-description">
+                    {{ problem.description }}
+                </div>
+                <div class="problem-description">
+                    <p>Note:Take the input given in the program</p>
+                </div>
+                <div class="example-section">
+                    <h3>Example Input</h3>
+                    <div class="example-box">
+                        {{ problem.test_cases[0].input }}
+                    </div>
+
+                    <h3>Expected Output</h3>
+                    <div class="example-box">
+                        {{ problem.test_cases[0].output }}
+                    </div>
+                </div>
+
+                <form id="codeForm" action="{{ url_for('submit_code') }}" method="POST">
+                    <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                    
+                    <div class="code-editor">
+                        <label for="code">Write Your Solution</label>
+                        <textarea 
+                            name="code" 
+                            id="code" 
+                            placeholder="Write your solution here..."
+                            required
+                            spellcheck="false"
+                        ></textarea>
+                    </div>
+
+                    <div class="language-select">
+                        <label for="language">Programming Language</label>
+                        <select name="language" id="language" required>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="c">C</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="submit-btn">
+                            <span>Submit Solution</span>
+                        </button>
+                        <a href="{{ url_for('compete') }}" class="back-btn">Back to Problems</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced tab support in the textarea
+        document.getElementById('code').addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const value = this.value;
+                const before = value.substring(0, start);
+                const after = value.substring(end);
+                const lines = before.split('\n');
+                const currentLine = lines[lines.length - 1];
+                const indentLevel = currentLine.match(/^\s*/)[0].length;
+                this.value = before + '    ' + after;
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+
+        // Enhanced form submission handling with loading state
+        document.getElementById('codeForm').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Submitting...</span>
+            `;
+            
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+            }, 2000);
+        });
+
+        // Enhanced language-specific placeholder text with syntax highlighting hints
+        const languageSelect = document.getElementById('language');
+        const codeTextarea = document.getElementById('code');
+        const placeholders = {
+            python: '# Write your Python solution here\n\ndef solution(input_data):\n    # Your code here\n    return result',
+            javascript: '// Write your JavaScript solution here\n\nfunction solution(inputData) {\n    // Your code here\n    return result;\n}',
+            java: '// Write your Java solution here\n\npublic class Solution {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}',
+            cpp: '// Write your C++ solution here\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // Your code here\n    return 0;\n}',
+            c: '// Write your C solution here\n\n#include <stdio.h>\n\nint main() {\n    // Your code here\n    return 0;\n}'
+        };
+
+        languageSelect.addEventListener('change', function() {
+            codeTextarea.placeholder = placeholders[this.value];
+            if (codeTextarea.value.trim() === '' || Object.values(placeholders).includes(codeTextarea.value.trim())) {
+                codeTextarea.value = placeholders[this.value];
+                // Select the comment placeholder text for easy replacement
+                const lines = codeTextarea.value.split('\n');
+                const commentLine = lines.findIndex(line => line.includes('Your code here'));
+                if (commentLine !== -1) {
+                    const start = lines.slice(0, commentLine).join('\n').length + 
+                                (commentLine > 0 ? 1 : 0) + 
+                                lines[commentLine].indexOf('Your code here');
+                    codeTextarea.setSelectionRange(start, start + 13);
+                }
+            }
+        });
+
+        // Set initial placeholder and trigger change event
+        codeTextarea.value = placeholders[languageSelect.value];
+        
+        // Add line numbers (optional enhancement)
+        codeTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    </script>
+</body>
+</html>

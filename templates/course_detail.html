@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course_name }} - Course Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --sidebar-width: 300px;
+            --compiler-width: 50%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            padding: 2rem;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-desc {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .module-list {
+            list-style: none;
+        }
+
+        .module-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .module-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #4b5563;
+            text-decoration: none;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .module-link:hover {
+            background: #f3f4f6;
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .module-link.active {
+            background: #ede9fe;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .module-icon {
+            margin-right: 0.75rem;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-left: calc(var(--sidebar-width) + 2rem);
+        }
+
+        .course-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .course-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--bg-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .video-wrapper {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .video-wrapper:hover {
+            transform: translateY(-4px);
+        }
+
+        .embed-responsive {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+
+        .embed-responsive iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--bg-gradient);
+            color: white;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 2px solid #e5e7eb;
+            color: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-2px);
+        }
+
+        .quiz-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        .quiz-section h3 {
+            font-size: 1.875rem;
+            color: #111827;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-section p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-color);
+        }
+
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: #e5e7eb;
+            margin: 0 1rem;
+            position: relative;
+            max-width: 100px;
+        }
+
+        .step-connector::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--primary-color);
+            width: 0;
+            transition: width 0.5s ease;
+        }
+
+        .step.active + .step-connector::after {
+            width: 100%;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1) rotate(360deg);
+        }
+
+        #compiler-window {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--compiler-width);
+            height: 100%;
+            background: white;
+            box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        #compiler-window.active {
+            transform: translateX(0);
+        }
+
+        #compiler-window iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        #compiler-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        #compiler-close-btn:hover {
+            transform: rotate(90deg);
+            background: var(--primary-hover);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 250px;
+                --compiler-width: 70%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                margin-bottom: 2rem;
+                padding: 1rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #compiler-window {
+                width: 100%;
+            }
+
+            .course-title {
+                font-size: 2rem;
+            }
+
+            .video-wrapper {
+                margin: 0 -1rem;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Course Overview</h2>
+                <p class="sidebar-desc">Master the fundamentals and beyond</p>
+            </div>
+            <ul class="module-list">
+                <li class="module-item">
+                    <a href="{{ url_for('courses_intro', course_name=course.course_name) }}" class="module-link active">
+                        <i class="fas fa-info-circle module-icon"></i>
+                        Introduction
+                    </a>
+                </li>
+                <li class="module-item">
+                    <a href="{{ url_for('display_concepts', course_name=course.course_name) }}" class="module-link">
+                        <i class="fas fa-book module-icon"></i>
+                        Concepts
+                    </a>
+                </li>
+                <li class="module-item">
+                    <a href="{{ url_for('static', filename=course.notes_url.split('/static/')[1]) }}" class="module-link" target="_blank">
+                        <i class="fas fa-download module-icon"></i>
+                        Download Notes
+                    </a>
+                </li>
+                <li class="module-item">
+                    <a href="{{ url_for('project', course_name=course.course_name) }}" class="module-link">
+                        <i class="fas fa-project-diagram module-icon"></i>
+                        Projects
+                    </a>
+                </li>
+                
+                <li class="module-item">
+                    <a href="#" onclick="showQuizSection()" class="module-link">
+                        <i class="fas fa-question-circle module-icon"></i>
+                        Quiz
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="course-header">
+                <h1 class="course-title">{{ course_name }}</h1>
+                <div class="progress-steps">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <span class="step-label">Watch</span>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <span class="step-label">Quiz</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="video-section">
+                <div class="video-wrapper">
+                    <div class="embed-responsive">
+                        <iframe src="{{ course.video_url.replace('watch?v=', 'embed/') }}?enablejsapi=1" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="showQuizSection()">
+                        Continue to Quiz
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz-section" class="quiz-section">
+                <h3>Ready for the Quiz?</h3>
+                <p>Test your knowledge and understanding of the course material.</p>
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="showVideoSection()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Video
+                    </button>
+                    <button class="btn btn-primary" onclick="startQuiz()">
+                        Start Quiz
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <button class="floating-btn" onclick="toggleCompiler()">
+        <i class="fas fa-code"></i>
+    </button>
+
+    <div id="compiler-window">
+        <button id="compiler-close-btn" onclick="toggleCompiler()">
+            <i class="fas fa-times"></i>
+        </button>
+        <iframe src="/compiler"></iframe>
+    </div>
+
+    <script>
+        function showQuizSection() {
+            document.getElementById('video-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
+            document.querySelectorAll('.step')[1].classList.add('active');
+        }
+
+        function showVideoSection() {
+            document.getElementById('video-section').style.display = 'block';
+            document.getElementById('quiz-section').style.display = 'none';
+            document.querySelectorAll('.step')[1].classList.remove('active');
+        }
+
+        function startQuiz() {
+            window.location.href = "/quiz/{{ course_name }}";
+        }
+
+        function toggleCompiler() {
+            const compilerWindow = document.getElementById('compiler-window');
+            compilerWindow.classList.toggle('active');
+            
+            // Get the video iframe
+            const videoIframe = document.querySelector('.embed-responsive iframe');
+            
+            // If compiler is being shown, pause the video
+            if (compilerWindow.classList.contains('active')) {
+                videoIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            }
+        }
+
+        // Handle mobile sidebar
+        if (window.innerWidth <= 768) {
+            const sidebar = document.querySelector('.sidebar');
+            let touchStart = null;
+            let touchEnd = null;
+
+            document.addEventListener('touchstart', (e) => {
+                touchStart = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                touchEnd = e.touches[0].clientX;
+            });
+
+            document.addEventListener('touchend', () => {
+                if (!touchStart || !touchEnd) return;
+                
+                const distance = touchStart - touchEnd;
+                const isLeftSwipe = distance > 50;
+                const isRightSwipe = distance < -50;
+
+                if (isLeftSwipe) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                } else if (isRightSwipe) {
+                    sidebar.style.transform = 'translateX(0)';
+                }
+
+                touchStart = null;
+                touchEnd = null;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Introduction - {{ course_name.capitalize() }}</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --accent-color: #c7d2fe;
+            --success-color: #34d399;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 1rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .course-intro {
+            background: var(--card-background);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 2rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        li {
+            color: var(--text-secondary);
+            margin: 0.8rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 1.1rem;
+        }
+
+        li::before {
+            content: "→";
+            color: var(--success-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            background: var(--card-background);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            h3 {
+                font-size: 1.25rem;
+            }
+
+            .course-intro {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Course Introduction</h1>
+        </div>
+        <div id="courseIntro" class="course-intro"></div>
+    </div>
+
+    <script>
+        // Inject the course_intro dictionary and course_name from Flask
+        const courseIntro = {{ course_intro|tojson }};
+        const courseName = "{{ course_name|lower }}";
+
+        // Function to format and inject HTML for each course
+        function formatCourseIntro(course) {
+            return `
+                <div class="section">
+                    <h2>What is ${course.name}?</h2>
+                    <p>${course.description}</p>
+                </div>
+
+                <div class="section">
+                    <h3>What is the Demand for ${course.name}?</h3>
+                    <ul>
+                        ${course.demand.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>What You Can Do After Learning ${course.name}:</h3>
+                    <ul>
+                        ${course.skills.map(skill => `<li>${skill}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>Focused Companies Using ${course.name}:</h3>
+                    <ul>
+                        ${course.companies.map(company => `<li>${company}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>Next Preferable Courses After ${course.name}:</h3>
+                    <ul>
+                        ${course.nextCourses.map(nextCourse => `<li>${nextCourse}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Display the course introduction based on the selected course
+        const courseIntroDiv = document.getElementById('courseIntro');
+        if (courseName in courseIntro) {
+            const course = courseIntro[courseName];
+            courseIntroDiv.innerHTML = formatCourseIntro(course);
+        } else {
+            courseIntroDiv.innerHTML = '<div class="error-message">Sorry, no introduction is available for the entered course.</div>';
+        }
+    </script>
+</body>
+</html>

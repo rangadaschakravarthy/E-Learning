@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Basic Tetris HTML Game</title>
+<meta charset="UTF-8">
+<style>
+html, body {
+height: 100%;
+margin: 0;
+}
+body {
+background: black;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+canvas {
+border: 1px solid white;
+}
+</style>
+</head>
+<body>
+<canvas width="320" height="640" id="game"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const context = canvas.getContext('2d');
+const grid = 32;
+const tetrominoSequence = [];
+
+// Tetromino shapes and colors
+const tetrominos = {
+'I': [[0,0,0,0], [1,1,1,1], [0,0,0,0], [0,0,0,0]],
+'J': [[1,0,0], [1,1,1], [0,0,0]],
+'L': [[0,0,1], [1,1,1], [0,0,0]],
+'O': [[1,1], [1,1]],
+'S': [[0,1,1], [1,1,0], [0,0,0]],
+'Z': [[1,1,0], [0,1,1], [0,0,0]],
+'T': [[0,1,0], [1,1,1], [0,0,0]]
+};
+
+const colors = {
+'I': 'cyan', 'O': 'yellow', 'T': 'purple',
+'S': 'green', 'Z': 'red', 'J': 'blue', 'L': 'orange'
+};
+
+let count = 0;
+let tetromino = getNextTetromino();
+let rAF = null; // keep track of the animation frame so we can cancel it
+let gameOver = false;
+
+// Game loop
+function loop() {
+rAF = requestAnimationFrame(loop);
+context.clearRect(0, 0, canvas.width, canvas.height);
+
+// Draw the playfield
+for (let row = 0; row < 20; row++) {
+for (let col = 0; col < 10; col++) {
+if (playfield[row][col]) {
+const name = playfield[row][col];
+context.fillStyle = colors[name];
+context.fillRect(col * grid, row * grid, grid-1, grid-1);
+}
+}
+}
+
+// Draw the active tetromino
+if (tetromino) {
+if (++count > 35) {
+tetromino.row++;
+count = 0;
+if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
+tetromino.row--;
+placeTetromino();
+}
+}
+context.fillStyle = colors[tetromino.name];
+for (let row = 0; row < tetromino.matrix.length; row++) {
+for (let col = 0; col < tetromino.matrix[row].length; col++) {
+if (tetromino.matrix[row][col]) {
+context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid-1, grid-1);
+}
+}
+}
+}
+}
+
+// Start the game
+rAF = requestAnimationFrame(loop);
+</script>
+</body>
+</html>

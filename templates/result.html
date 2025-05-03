@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results</title>
+    <style>
+        :root {
+            --success-color: #22c55e;
+            --success-bg: #f0fdf4;
+            --error-color: #ef4444;
+            --error-bg: #fef2f2;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        .results-header {
+            background: linear-gradient(to right, #4f46e5, #6366f1);
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .results-header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-content {
+            padding: 2rem;
+        }
+
+        .test-cases {
+            list-style: none;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .test-case {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .test-case:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .test-case.success {
+            background: var(--success-bg);
+            border-color: var(--success-color);
+        }
+
+        .test-case.failed {
+            background: var(--error-bg);
+            border-color: var(--error-color);
+        }
+
+        .test-case-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .test-case-number {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-badge.failed {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .test-case-message {
+            color: #475569;
+            font-size: 0.9375rem;
+            white-space: pre-wrap;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-hover);
+        }
+
+        .back-link::before {
+            content: '←';
+            font-size: 1.1rem;
+        }
+
+        .summary {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .summary.all-passed {
+            background: var(--success-bg);
+            color: var(--success-color);
+        }
+
+        .summary.has-failures {
+            background: var(--error-bg);
+            color: var(--error-color);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .results-header {
+                padding: 1.5rem;
+            }
+
+            .results-content {
+                padding: 1.5rem;
+            }
+
+            .test-case {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="results-card">
+            <div class="results-header">
+                <h1>Test Results</h1>
+                <p>Execution completed</p>
+            </div>
+
+            <div class="results-content">
+                <div id="summary" class="summary">
+                    <!-- Summary will be inserted by JavaScript -->
+                </div>
+
+                <ul class="test-cases">
+                    {% for result in test_case_results %}
+                        <li class="test-case {{ 'success' if result.status == 'Success' else 'failed' }}">
+                            <div class="test-case-header">
+                                <span class="test-case-number">Test Case {{ result.test_case }}</span>
+                                <span class="status-badge {{ 'success' if result.status == 'Success' else 'failed' }}">
+                                    {{ result.status }}
+                                </span>
+                            </div>
+                            <div class="test-case-message">{{ result.message }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <a href="{{ url_for('compete') }}" class="back-link">Back to Problems</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add summary based on test results
+        document.addEventListener('DOMContentLoaded', function() {
+            const testCases = document.querySelectorAll('.test-case');
+            const failedTests = document.querySelectorAll('.test-case.failed');
+            const summary = document.getElementById('summary');
+            
+            if (failedTests.length === 0) {
+                summary.classList.add('all-passed');
+                summary.textContent = `All ${testCases.length} test cases passed! 🎉`;
+            } else {
+                summary.classList.add('has-failures');
+                summary.textContent = `${failedTests.length} of ${testCases.length} test cases failed`;
+            }
+        });
+
+        // Add animation for test cases
+        const testCases = document.querySelectorAll('.test-case');
+        testCases.forEach((testCase, index) => {
+            testCase.style.opacity = '0';
+            testCase.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                testCase.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                testCase.style.opacity = '1';
+                testCase.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    </script>
+</body>
+</html>

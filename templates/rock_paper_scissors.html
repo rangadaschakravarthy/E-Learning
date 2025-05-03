@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors - LearnPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #4338CA;
+      --secondary: #10B981;
+      --danger: #EF4444;
+      --background: #F3F4F6;
+      --surface: #FFFFFF;
+      --text: #1F2937;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background-color: var(--surface);
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .profile-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      transition: transform 0.2s;
+    }
+
+    .profile-icon:hover {
+      transform: scale(1.1);
+    }
+
+    .game-container {
+      max-width: 800px;
+      margin: 8rem auto 2rem;
+      padding: 2rem;
+      background: var(--surface);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .game-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .game-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4rem;
+      height: 0.25rem;
+      background: var(--primary);
+      border-radius: 0.25rem;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin: 2rem 0;
+      padding: 1rem;
+      background: var(--background);
+      border-radius: 0.5rem;
+    }
+
+    .score {
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .score-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .choice-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-0.5rem);
+    }
+
+    .choice-btn:active {
+      transform: scale(0.95);
+    }
+
+    .choice-icon {
+      width: 80px;
+      height: 80px;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.2s;
+    }
+
+    .choice-btn:hover .choice-icon {
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .choice-label {
+      position: absolute;
+      bottom: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    #result {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2rem 0;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      opacity: 0;
+      transform: translateY(1rem);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .win {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .lose {
+      background: var(--danger);
+      color: white;
+    }
+
+    .draw {
+      background: #6B7280;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .game-container {
+        margin: 6rem 1rem 2rem;
+        padding: 1rem;
+      }
+
+      .choices {
+        gap: 1rem;
+      }
+
+      .choice-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        LearnPro
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/courses" class="nav-link">Courses</a></li>
+        <li><a href="/about" class="nav-link">About Us</a></li>
+        <li><a href="/games" class="nav-link">Relax</a></li>
+        {% if session.get('logged_in') %}
+        <li class="nav-item">
+          <a href="/profile">
+            <img src="/static/images/profile.jpeg" alt="Profile" class="profile-icon">
+          </a>
+        </li>
+        {% else %}
+        <li><a href="/sign" class="nav-link">Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <div class="game-container">
+    <h1 class="game-title">Rock Paper Scissors</h1>
+    
+    <div class="score-board">
+      <div class="score">
+        <div class="score-label">You</div>
+        <div class="score-value" id="player-score">0</div>
+      </div>
+      <div class="score">
+        <div class="score-label">Computer</div>
+        <div class="score-value" id="computer-score">0</div>
+      </div>
+    </div>
+
+    <div class="choices">
+      <button class="choice-btn" onclick="playGame('Rock')">
+        <svg class="choice-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        </svg>
+        <span class="choice-label">Rock</span>
+      </button>
+      <button class="choice-btn" onclick="playGame('Paper')">
+        <svg class="choice-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        </svg>
+        <span class="choice-label">Paper</span>
+      </button>
+      <button class="choice-btn" onclick="playGame('Scissors')">
+        <svg class="choice-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="3"/>
+          <circle cx="18" cy="6" r="3"/>
+          <path d="M20 20L4 20"/>
+          <path d="M12 20V10"/>
+        </svg>
+        <span class="choice-label">Scissors</span>
+      </button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    let playerScore = 0;
+    let computerScore = 0;
+
+    function playGame(playerChoice) {
+      const choices = ['Rock', 'Paper', 'Scissors'];
+      const computerChoice = choices[Math.floor(Math.random() * 3)];
+      const resultElement = document.getElementById('result');
+      
+      let result = '';
+      let resultClass = '';
+
+      if (playerChoice === computerChoice) {
+        result = `Draw! Both chose ${playerChoice}`;
+        resultClass = 'draw';
+      } else if (
+        (playerChoice === 'Rock' && computerChoice === 'Scissors') ||
+        (playerChoice === 'Scissors' && computerChoice === 'Paper') ||
+        (playerChoice === 'Paper' && computerChoice === 'Rock')
+      ) {
+        result = `You win! ${playerChoice} beats ${computerChoice}`;
+        resultClass = 'win';
+        playerScore++;
+      } else {
+        result = `You lose! ${computerChoice} beats ${playerChoice}`;
+        resultClass = 'lose';
+        computerScore++;
+      }
+
+      // Update scores
+      document.getElementById('player-score').textContent = playerScore;
+      document.getElementById('computer-score').textContent = computerScore;
+
+      // Update result with animation
+      resultElement.textContent = result;
+      resultElement.className = resultClass;
+      resultElement.classList.add('show');
+
+      // Reset animation
+      setTimeout(() => {
+        resultElement.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

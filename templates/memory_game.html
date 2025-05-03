@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.8) !important;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #fff !important;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .game-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 2rem;
+      font-size: 1.2rem;
+    }
+
+    .memory-game {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      perspective: 1000px;
+      margin: 0 auto;
+      max-width: 720px;
+    }
+
+    .memory-card {
+      position: relative;
+      height: 150px;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transform: scale(1);
+      transition: transform 0.5s;
+    }
+
+    .memory-card:active {
+      transform: scale(0.97);
+      transition: transform 0.2s;
+    }
+
+    .memory-card.flip {
+      transform: rotateY(180deg);
+    }
+
+    .memory-card.matched {
+      transform: rotateY(180deg) scale(0.95);
+      cursor: default;
+    }
+
+    .memory-card.matched .front-face {
+      background: linear-gradient(135deg, #0055ff, #00a2ff);
+      border: 2px solid #0066ff;
+    }
+
+    .memory-card.matched .card-image {
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+
+    .front-face,
+    .back-face {
+      width: 100%;
+      height: 100%;
+      padding: 1rem;
+      position: absolute;
+      border-radius: 12px;
+      background: #2a2a4a;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .front-face {
+      transform: rotateY(180deg);
+      background: #fff;
+    }
+
+    .back-face {
+      background: linear-gradient(45deg, #ff0055, #ff00a2);
+      font-size: 2rem;
+      color: white;
+    }
+
+    .memory-card:hover .back-face {
+      box-shadow: 0 8px 25px rgba(255, 0, 85, 0.4);
+    }
+
+    .card-image {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(45deg, #ff0055, #ff00a2);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 0, 85, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .win-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      display: none;
+      z-index: 100;
+      border: 2px solid #ff0055;
+    }
+
+    .win-message h2 {
+      color: #ff0055;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .memory-game {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .memory-card {
+        height: 120px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .memory-game {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .memory-card {
+        height: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a class="navbar-brand" href="#">LearnPro</a>
+  </nav>
+
+  <div class="game-container">
+    <div class="game-header">
+      <h1 class="game-title">Memory Game</h1>
+      <div class="game-stats">
+        <div>Moves: <span id="moves">0</span></div>
+        <div>Time: <span id="time">0:00</span></div>
+      </div>
+    </div>
+
+    <div class="memory-game" id="memory-game"></div>
+
+    <div class="controls">
+      <button class="btn" id="restart-btn">New Game</button>
+    </div>
+
+    <div class="win-message" id="win-message">
+      <h2>Congratulations!</h2>
+      <p>You've completed the game in <span id="final-moves">0</span> moves</p>
+      <p>Time: <span id="final-time">0:00</span></p>
+      <button class="btn" onclick="startNewGame()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const gameImages = [
+      'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1555169062-013468b47731?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1517849845537-4d257902454a?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      'https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3'
+    ];
+
+    let hasFlippedCard = false;
+    let lockBoard = false;
+    let firstCard, secondCard;
+    let moves = 0;
+    let matches = 0;
+    let timeStarted = false;
+    let timer;
+    let seconds = 0;
+
+    function createBoard() {
+      const gameBoard = document.getElementById('memory-game');
+      const cardPairs = [...gameImages, ...gameImages];
+      shuffleArray(cardPairs);
+
+      cardPairs.forEach((image, index) => {
+        const card = document.createElement('div');
+        card.classList.add('memory-card');
+        card.dataset.framework = image;
+        
+        card.innerHTML = `
+          <img class="front-face card-image" src="${image}" alt="Memory Card">
+          <div class="back-face">?</div>
+        `;
+        
+        card.addEventListener('click', flipCard);
+        gameBoard.appendChild(card);
+      });
+    }
+
+    function flipCard() {
+      if (lockBoard) return;
+      if (this === firstCard) return;
+      
+      if (!timeStarted) {
+        startTimer();
+        timeStarted = true;
+      }
+
+      this.classList.add('flip');
+
+      if (!hasFlippedCard) {
+        hasFlippedCard = true;
+        firstCard = this;
+        return;
+      }
+
+      secondCard = this;
+      moves++;
+      document.getElementById('moves').textContent = moves;
+      checkForMatch();
+    }
+
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.framework === secondCard.dataset.framework;
+      isMatch ? disableCards() : unflipCards();
+    }
+
+    function disableCards() {
+      firstCard.removeEventListener('click', flipCard);
+      secondCard.removeEventListener('click', flipCard);
+      firstCard.classList.add('matched');
+      secondCard.classList.add('matched');
+      matches++;
+
+      if (matches === gameImages.length) {
+        setTimeout(() => {
+          showWinMessage();
+        }, 500);
+      }
+
+      resetBoard();
+    }
+
+    function unflipCards() {
+      lockBoard = true;
+      setTimeout(() => {
+        firstCard.classList.remove('flip');
+        secondCard.classList.remove('flip');
+        resetBoard();
+      }, 1000);
+    }
+
+    function resetBoard() {
+      [hasFlippedCard, lockBoard] = [false, false];
+      [firstCard, secondCard] = [null, null];
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function startTimer() {
+      timer = setInterval(() => {
+        seconds++;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        document.getElementById('time').textContent = 
+          `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function showWinMessage() {
+      clearInterval(timer);
+      const winMessage = document.getElementById('win-message');
+      document.getElementById('final-moves').textContent = moves;
+      document.getElementById('final-time').textContent = 
+        document.getElementById('time').textContent;
+      winMessage.style.display = 'block';
+    }
+
+    function startNewGame() {
+      const gameBoard = document.getElementById('memory-game');
+      const winMessage = document.getElementById('win-message');
+      
+      gameBoard.innerHTML = '';
+      winMessage.style.display = 'none';
+      moves = 0;
+      matches = 0;
+      seconds = 0;
+      timeStarted = false;
+      clearInterval(timer);
+      
+      document.getElementById('moves').textContent = '0';
+      document.getElementById('time').textContent = '0:00';
+      
+      createBoard();
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', startNewGame);
+    document.addEventListener('DOMContentLoaded', createBoard);
+  </script>
+</body>
+</html>

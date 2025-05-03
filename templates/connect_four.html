@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Four - LearnPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #4338CA;
+      --secondary: #10B981;
+      --danger: #EF4444;
+      --background: #F3F4F6;
+      --surface: #FFFFFF;
+      --text: #1F2937;
+      --red-player: #EF4444;
+      --yellow-player: #FBBF24;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background-color: var(--surface);
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .profile-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      transition: transform 0.2s;
+    }
+
+    .profile-icon:hover {
+      transform: scale(1.1);
+    }
+
+    .game-container {
+      max-width: 800px;
+      margin: 8rem auto 2rem;
+      padding: 2rem;
+      background: var(--surface);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .game-title {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .game-title::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4rem;
+      height: 0.25rem;
+      background: var(--primary);
+      border-radius: 0.25rem;
+    }
+
+    .board-container {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(7, 60px);
+      grid-template-rows: repeat(6, 60px);
+      gap: 0.5rem;
+      padding: 1rem;
+      background: var(--primary);
+      border-radius: 1rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .cell {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--surface);
+      border: 3px solid var(--primary-dark);
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cell:hover {
+      transform: scale(0.95);
+    }
+
+    .cell.red {
+      background-color: var(--red-player);
+      animation: dropPiece 0.5s ease-in-out;
+    }
+
+    .cell.yellow {
+      background-color: var(--yellow-player);
+      animation: dropPiece 0.5s ease-in-out;
+    }
+
+    @keyframes dropPiece {
+      0% {
+        transform: translateY(-300px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .game-info {
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .current-player {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .current-player span {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .current-player.red span {
+      background-color: var(--red-player);
+    }
+
+    .current-player.yellow span {
+      background-color: var(--yellow-player);
+    }
+
+    #result {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      opacity: 0;
+      transform: translateY(1rem);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #result.red {
+      background-color: var(--red-player);
+      color: white;
+    }
+
+    #result.yellow {
+      background-color: var(--yellow-player);
+      color: var(--text);
+    }
+
+    #restart-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem auto;
+    }
+
+    #restart-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .game-container {
+        margin: 6rem 1rem 2rem;
+        padding: 1rem;
+      }
+
+      .board {
+        grid-template-columns: repeat(7, 40px);
+        grid-template-rows: repeat(6, 40px);
+        gap: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        LearnPro
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/courses" class="nav-link">Courses</a></li>
+        <li><a href="/about" class="nav-link">About Us</a></li>
+        <li><a href="/games" class="nav-link">Relax</a></li>
+        {% if session.get('logged_in') %}
+        <li class="nav-item">
+          <a href="/profile">
+            <img src="/static/images/profile.jpeg" alt="Profile" class="profile-icon">
+          </a>
+        </li>
+        {% else %}
+        <li><a href="/sign" class="nav-link">Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <div class="game-container">
+    <h1 class="game-title">Connect Four</h1>
+    
+    <div class="game-info">
+      <div id="current-player" class="current-player red">
+        Current Player: Red <span></span>
+      </div>
+    </div>
+
+    <div class="board-container">
+      <div class="board">
+        <script>
+          for (let i = 0; i < 42; i++) {
+            document.write(`<div class="cell" data-index="${i}" onclick="dropPiece(this)"></div>`);
+          }
+        </script>
+      </div>
+    </div>
+
+    <div id="result"></div>
+
+    <button id="restart-btn" onclick="restartGame()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 9-9a9 9 0 0 1 6.9 3.2L21 8"/>
+        <path d="M21 3v5h-5"/>
+        <path d="M21 12a9 9 0 0 1-9 9a9 9 0 0 1-6.9-3.2L3 16"/>
+        <path d="M3 21v-5h5"/>
+      </svg>
+      Restart Game
+    </button>
+  </div>
+
+  <script>
+    let board = Array(6).fill(null).map(() => Array(7).fill(''));
+    let currentPlayer = 'red';
+    let gameActive = true;
+
+    function updateCurrentPlayer() {
+      const playerIndicator = document.getElementById('current-player');
+      playerIndicator.className = `current-player ${currentPlayer}`;
+      playerIndicator.innerHTML = `Current Player: ${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)} <span></span>`;
+    }
+
+    function dropPiece(cell) {
+      if (!gameActive) return;
+
+      let index = parseInt(cell.getAttribute('data-index'));
+      let column = index % 7;
+
+      for (let row = 5; row >= 0; row--) {
+        if (board[row][column] === '') {
+          board[row][column] = currentPlayer;
+          const targetCell = document.querySelector(`.cell[data-index='${row * 7 + column}']`);
+          targetCell.classList.add(currentPlayer);
+
+          if (checkWinner()) {
+            gameActive = false;
+            const result = document.getElementById('result');
+            result.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)} wins!`;
+            result.className = `show ${currentPlayer}`;
+            setTimeout(resetBoard, 2000);
+            return;
+          }
+
+          if (checkDraw()) {
+            gameActive = false;
+            const result = document.getElementById('result');
+            result.textContent = "It's a draw!";
+            result.className = 'show';
+            setTimeout(resetBoard, 2000);
+            return;
+          }
+
+          currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+          updateCurrentPlayer();
+          return;
+        }
+      }
+    }
+
+    function checkWinner() {
+      const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+      for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < 7; col++) {
+          for (let [dx, dy] of directions) {
+            if (checkDirection(row, col, dx, dy)) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function checkDirection(row, col, dx, dy) {
+      const color = board[row][col];
+      if (color === '') return false;
+
+      for (let i = 1; i < 4; i++) {
+        const newRow = row + i * dx;
+        const newCol = col + i * dy;
+        if (newRow < 0 || newRow >= 6 || newCol < 0 || newCol >= 7 || board[newRow][newCol] !== color) return false;
+      }
+      return true;
+    }
+
+    function checkDraw() {
+      return board.every(row => row.every(cell => cell !== ''));
+    }
+
+    function resetBoard() {
+      setTimeout(() => {
+        restartGame();
+      }, 500);
+    }
+
+    function restartGame() {
+      board = Array(6).fill(null).map(() => Array(7).fill(''));
+      document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.remove('red', 'yellow');
+      });
+      currentPlayer = 'red';
+      gameActive = true;
+      updateCurrentPlayer();
+      const result = document.getElementById('result');
+      result.textContent = '';
+      result.className = '';
+    }
+
+    // Initialize the game
+    updateCurrentPlayer();
+  </script>
+</body>
+</html>

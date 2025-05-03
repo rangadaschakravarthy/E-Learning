@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course_name }} Projects</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --background-color: #f3f4f6;
+            --card-background: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        #project-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select:hover {
+            border-color: var(--secondary-color);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .language-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .selected-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .back-link::before {
+            content: '←';
+            margin-right: 0.5rem;
+            font-size: 1.2em;
+        }
+
+        .selected-info.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .back-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="language-icon">🚀</div>
+            <h1>{{ course_name }} Projects</h1>
+            <p class="subtitle">Discover exciting projects tailored to your programming journey</p>
+        </div>
+
+        <!-- Removed the language selection form group -->
+        <form id="project-form" method="GET">
+            <div class="form-group">
+                <label for="level">Experience Level</label>
+                <select id="level" name="level" required>
+                    <option value="" disabled selected>Select your level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+
+            <button type="submit">Explore Projects</button>
+        </form>
+
+        <div id="selected-info" class="selected-info">
+            <p>Selected Path: <span id="selection-text"></span></p>
+        </div>
+        <button onclick="goBack()" class="back-button">← Back to Course</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('project-form');
+        const levelSelect = document.getElementById('level');
+        const selectedInfo = document.getElementById('selected-info');
+        const selectionText = document.getElementById('selection-text');
+
+        function updateFormAction() {
+            const level = levelSelect.value;
+            
+            if (level) {
+                form.action = `/project/{{ course_name | lower }}/${level}`; // Use course_name dynamically
+                selectionText.textContent = `Level: ${level.charAt(0).toUpperCase() + level.slice(1)}`;
+                selectedInfo.classList.add('visible');
+            }
+        }
+
+        levelSelect.addEventListener('change', updateFormAction);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const level = levelSelect.value;
+            
+            if (level) {
+                window.location.href = `/project/{{ course_name | lower }}/${level}`; // Redirect to the project page with the selected level
+            }
+        });
+        function goBack() {
+            window.location.href = `/course_detail/${encodeURIComponent("{{ course_name }}")}`;
+        }
+    </script>
+</body>
+</html>

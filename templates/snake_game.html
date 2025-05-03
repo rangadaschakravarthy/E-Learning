@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game - LearnPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #4338CA;
+      --secondary: #10B981;
+      --danger: #EF4444;
+      --background: #F3F4F6;
+      --surface: #FFFFFF;
+      --text: #1F2937;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background-color: var(--surface);
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-brand svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .game-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .game-wrapper {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .game-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .game-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .game-subtitle {
+      color: #6B7280;
+      font-size: 0.875rem;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      margin: 1rem 0;
+    }
+
+    #gameCanvas {
+      background-color: #F8FAFC;
+      border-radius: 0.5rem;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1rem 0;
+      font-weight: 500;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .score {
+      color: var(--secondary);
+    }
+
+    .high-score {
+      color: var(--primary);
+    }
+
+    #restart-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem auto;
+    }
+
+    #restart-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .game-over {
+      color: var(--danger);
+      font-weight: 600;
+      margin: 1rem 0;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      padding: 1rem;
+      background-color: #F8FAFC;
+      border-radius: 0.5rem;
+    }
+
+    .controls-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #4B5563;
+    }
+
+    .controls-text {
+      font-size: 0.875rem;
+      color: #6B7280;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .game-wrapper {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+        LearnPro
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/courses" class="nav-link">Courses</a></li>
+        <li><a href="/games" class="nav-link">Games</a></li>
+        <li><a href="/about" class="nav-link">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="game-container">
+    <div class="game-wrapper">
+      <div class="game-header">
+        <h1 class="game-title">Snake Game</h1>
+        <p class="game-subtitle">Use arrow keys to control the snake</p>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+      </div>
+
+      <div class="game-stats">
+        <div class="stat score">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20v-6M6 20V10M18 20V4"/>
+          </svg>
+          Score: <span id="current-score">0</span>
+        </div>
+        <div class="stat high-score">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 15l-2 5l9-9l-9-9l2 5l-9 9l9-9"/>
+          </svg>
+          High Score: <span id="high-score">0</span>
+        </div>
+      </div>
+
+      <h2 id="result" class="game-over"></h2>
+      
+      <button id="restart-btn" onclick="restartGame()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 0 1 9-9a9 9 0 0 1 6.9 3.2L21 8"/>
+          <path d="M21 3v5h-5"/>
+          <path d="M21 12a9 9 0 0 1-9 9a9 9 0 0 1-6.9-3.2L3 16"/>
+          <path d="M3 21v-5h5"/>
+        </svg>
+        Restart Game
+      </button>
+
+      <div class="controls">
+        <h3 class="controls-title">How to Play</h3>
+        <p class="controls-text">Use the arrow keys to move the snake. Collect the food to grow longer, but don't hit the walls or yourself!</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const box = 20;
+    let snake, direction, food, game;
+    let score = 0;
+    let highScore = localStorage.getItem('snakeHighScore') || 0;
+
+    document.getElementById('high-score').textContent = highScore;
+
+    function initGame() {
+      snake = [{ x: 10 * box, y: 10 * box }];
+      direction = '';
+      score = 0;
+      document.getElementById('current-score').textContent = score;
+      generateFood();
+      document.getElementById('result').textContent = '';
+    }
+
+    function generateFood() {
+      food = {
+        x: Math.floor(Math.random() * (canvas.width / box)) * box,
+        y: Math.floor(Math.random() * (canvas.height / box)) * box,
+      };
+      // Make sure food doesn't appear on snake
+      while (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        food = {
+          x: Math.floor(Math.random() * (canvas.width / box)) * box,
+          y: Math.floor(Math.random() * (canvas.height / box)) * box,
+        };
+      }
+    }
+
+    function changeDirection(event) {
+      if (event.keyCode === 37 && direction !== 'RIGHT') direction = 'LEFT';
+      if (event.keyCode === 38 && direction !== 'DOWN') direction = 'UP';
+      if (event.keyCode === 39 && direction !== 'LEFT') direction = 'RIGHT';
+      if (event.keyCode === 40 && direction !== 'UP') direction = 'DOWN';
+    }
+
+    function collision(head, array) {
+      return array.some(segment => head.x === segment.x && head.y === segment.y);
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = '#E5E7EB';
+      for (let i = 0; i <= canvas.width; i += box) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= canvas.height; i += box) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+
+      // Draw snake
+      snake.forEach((segment, index) => {
+        ctx.fillStyle = index === 0 ? '#4F46E5' : '#818CF8';
+        ctx.fillRect(segment.x, segment.y, box - 1, box - 1);
+        ctx.strokeStyle = '#4338CA';
+        ctx.strokeRect(segment.x, segment.y, box - 1, box - 1);
+      });
+
+      // Draw food
+      ctx.fillStyle = '#10B981';
+      ctx.beginPath();
+      ctx.arc(food.x + box/2, food.y + box/2, box/2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      let snakeX = snake[0].x;
+      let snakeY = snake[0].y;
+
+      if (direction === 'LEFT') snakeX -= box;
+      if (direction === 'UP') snakeY -= box;
+      if (direction === 'RIGHT') snakeX += box;
+      if (direction === 'DOWN') snakeY += box;
+
+      if (snakeX === food.x && snakeY === food.y) {
+        score++;
+        document.getElementById('current-score').textContent = score;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem('snakeHighScore', highScore);
+          document.getElementById('high-score').textContent = highScore;
+        }
+        generateFood();
+      } else {
+        snake.pop();
+      }
+
+      const newHead = { x: snakeX, y: snakeY };
+
+      if (
+        snakeX < 0 ||
+        snakeY < 0 ||
+        snakeX >= canvas.width ||
+        snakeY >= canvas.height ||
+        collision(newHead, snake)
+      ) {
+        clearInterval(game);
+        document.getElementById('result').textContent = 'Game Over!';
+        return;
+      }
+
+      snake.unshift(newHead);
+    }
+
+    function startGame() {
+      game = setInterval(draw, 900);
+    }
+
+    function restartGame() {
+      clearInterval(game);
+      initGame();
+      startGame();
+    }
+
+    document.addEventListener('keydown', changeDirection);
+    initGame();
+    startGame();
+  </script>
+</body>
+</html>
