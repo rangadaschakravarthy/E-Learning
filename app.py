@@ -13,15 +13,15 @@ from PIL import Image, ImageDraw,ImageFont
 app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Anurag@123'
-app.config['MYSQL_DB'] = 'wt'
+app.config['MYSQL_PASSWORD'] = '<db_password>'
+app.config['MYSQL_DB'] = '<db_name>'
 app.secret_key = 'xyz'
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = '22eg112c10@anurag.edu.in'
-app.config['MAIL_PASSWORD'] = 'Abcdefgh123'
+app.config['MAIL_USERNAME'] = '<email_id>'
+app.config['MAIL_PASSWORD'] = '<email_password>'
 
 mail = Mail(app)
 mysql = MySQL(app)
